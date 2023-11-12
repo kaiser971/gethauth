@@ -3,27 +3,30 @@ pipeline {
 
     // Déclencher le pipeline sur les changements de la branche 'dev'
     triggers {
-        pollSCM('* * * * *')  // Sonde le SCM toutes les minutes. Ajustez selon les besoins
+        pollSCM('H/5 * * * *')  // Sonde le SCM toutes les 5 minutes. Ajustez selon les besoins
     }
 
     environment {
-        // Définissez vos variables d'environnement ici si nécessaire
+        // Exemple de variable d'environnement
+        TEST_ENV_VARIABLE = 'valeurDeTest'
     }
 
     stages {
         stage('Build') {
             steps {
-                // Commandes pour construire votre projet
+                // Commande de build fictive
                 echo 'Building...'
-                // Exemple : sh 'mvn clean package'
+                sh 'echo "Simulation du processus de build"'
+                // Remplacez par vos propres commandes de build
             }
         }
 
         stage('Test') {
             steps {
-                // Commandes pour tester votre projet
+                // Commande de test fictive
                 echo 'Testing...'
-                // Exemple : sh 'mvn test'
+                sh 'echo "Simulation des tests"'
+                // Remplacez par vos propres commandes de test
             }
         }
 
@@ -32,17 +35,20 @@ pipeline {
                 branch 'dev'  // Exécute cette étape uniquement pour la branche 'dev'
             }
             steps {
-                // Commandes pour déployer votre projet
+                // Commande de déploiement fictive
                 echo 'Deploying...'
-                // Exemple : sh './deploy_script.sh'
+                sh 'echo "Simulation du déploiement"'
+                // Remplacez par vos propres commandes de déploiement
             }
         }
     }
 
     post {
         always {
-            // Actions à effectuer après le pipeline, comme le nettoyage
+            // Actions après le pipeline
             echo 'Pipeline completed.'
+            sh 'echo "Nettoyage et autres actions post-pipeline"'
+            // Ajoutez ici des commandes de nettoyage ou de notification
         }
     }
 }
