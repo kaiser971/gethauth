@@ -20,7 +20,7 @@ pipeline {
         DB_PASSWORD = 'root'
         DB_ROOT_PASSWORD = 'root'
         DATABASE_URL = "mysql://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?serverVersion=8.0.32&charset=utf8mb4"
-        CORS_ALLOW_ORIGIN = '^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'
+        CORS_ALLOW_ORIGIN = '^https?://(localhost|127\\.0\\.0\\.1)(:[0-9]+)?$'
         APP_DEBUG = 1
         GET_USER_INFO_URL = 'https://devel-plage-infoservice.atih.sante.fr/plage-infoservice/getUserInfo.do'
         GET_ETABLISSEMENT_INFO_URL = 'https://devel-plage-infoservice.atih.sante.fr/plage-infoservice/getESInfo.do'
