@@ -47,6 +47,9 @@ COPY --chown=www:www . /var/www
 # Change current user to www
 USER www
 
+#Run composer
+RUN composer install
+
 # Expose port 9000 and start php server
 EXPOSE 9000
 CMD ["php-fpm"]
