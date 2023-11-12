@@ -30,32 +30,17 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Build and Test') {
             steps {
-                echo 'Building...'
-                sh 'docker-compose -f docker-compose.yml build'
-                sh 'docker-compose -f docker-compose.yml up -d'
-                sh 'docker-compose -f docker-compose.yml exec php php bin/console --env=test doctrine:database:create'
-                sh 'docker-compose -f docker-compose.yml exec php php bin/console --env=test doctrine:schema:create'
-                sh 'docker-compose -f docker-compose.yml exec php php bin/console --env=test doctrine:fixtures:load'
-                sh 'docker-compose -f docker-compose.yml down'
-            }
-        }
-
-
-        stage('Test') {
-            steps {
-                echo 'Testing...'
-                sh 'docker-compose -f docker-compose.yml up -d'
                 script {
-                    try {
-                        sh 'docker-compose -f docker-compose.yml exec php php bin/phpunit'
-                    } catch (Exception e) {
-                        echo 'Tests failed'
-                        throw e // Ceci renvoie un échec de pipeline si les tests échouent
+                    docker.image('php:8.2-fpm').inside {
+                        sh 'composer install'
+                        sh 'php bin/console --env=test doctrine:database:create'
+                        sh 'php bin/console --env=test doctrine:schema:create'
+                        sh 'php bin/console --env=test doctrine:fixtures:load'
+                        sh 'php bin/phpunit'
                     }
                 }
-                sh 'docker-compose -f docker-compose.yml down'
             }
         }
 
@@ -63,34 +48,33 @@ pipeline {
             when {
                 branch 'dev'
             }
-             steps {
-                    echo 'Deploying...'
-                    sshPublisher(publishers: [
-                        sshPublisherDesc(
-                            configName: "root (ssh jenkins?)",
-                            transfers: [
-                                sshTransfer(
-                                    sourceFiles: "docker-compose.yml, .env, etc",
-                                    removePrefix: "path/to/source",
-                                    remoteDirectory: "var/www/gethauth",
-                                    execCommand: """
-                                        cd /var/www/gethauth
-                                        git pull
-                                        composer install
-                                        php bin/console d:m:m
-                                    """
-                                )
-                            ]
-                        )
-                    ])
-             }
+            steps {
+                echo 'Deploying...'
+                sshPublisher(publishers: [
+                    sshPublisherDesc(
+                        configName: "ssh-server-config",
+                        transfers: [
+                            sshTransfer(
+                                sourceFiles: "**/*",
+                                removePrefix: "path/to/source",
+                                remoteDirectory: "/var/www/gethauth",
+                                execCommand: """
+                                    cd /var/www/gethauth
+                                    git pull
+                                    composer install
+                                    php bin/console d:m:m
+                                """
+                            )
+                        ]
+                    )
+                ])
+            }
         }
     }
 
     post {
         always {
             echo 'Pipeline completed.'
-            // Nettoyage ou autres actions post-pipeline
         }
     }
 }
