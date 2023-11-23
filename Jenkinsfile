@@ -43,33 +43,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Deploy') {
-            when {
-                branch 'dev'
-            }
-            steps {
-                echo 'Deploying...'
-                sshPublisher(publishers: [
-                    sshPublisherDesc(
-                        configName: "ssh-server-config",
-                        transfers: [
-                            sshTransfer(
-                                sourceFiles: "**/*",
-                                removePrefix: "path/to/source",
-                                remoteDirectory: "/var/www/gethauth",
-                                execCommand: """
-                                    cd /var/www/gethauth
-                                    git pull
-                                    composer install
-                                    php bin/console d:m:m
-                                """
-                            )
-                        ]
-                    )
-                ])
-            }
-        }
     }
 
     post {
